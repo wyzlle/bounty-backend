@@ -3,7 +3,7 @@
 
 datasource db {
     provider = "postgres"
-    url      = env("DATABASE_URL")
+    url      = "postgresql://postgres:jXRCu6uIz7Gr8ZJh6cPx@containers-us-west-62.railway.app:6431/railway"
 }
 
 generator client {
@@ -14,4 +14,5 @@ model Bounty {
     id       String @id
     amount   Int    @default(0)
     assignee String @default("")
+    benefactor String
 }

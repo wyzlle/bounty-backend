@@ -11,6 +11,7 @@ apiBountyRouter.get("/(.*)", async (ctx) => {
     id: id,
     amount: 0,
     assignee: "",
+    benefactor: "",
   };
   let bounty;
 
@@ -37,9 +38,10 @@ apiBountyRouter.put("/", async (ctx) => {
     id: req.id || "",
     amount: req.amount || 0,
     assignee: req.assignee || "",
+    benefactor: req.benefactor || "",
   };
 
-  if (bounty.id === "" || bounty.amount <= 0) {
+  if (bounty.id === "" || bounty.amount <= 0 || bounty.benefactor === "") {
     return (ctx.response.res.statusCode = 400);
   }
   try {
@@ -56,6 +58,7 @@ apiBountyRouter.put("/", async (ctx) => {
         data: {
           amount: bounty.amount,
           assignee: bounty.assignee,
+          benefactor: bounty.benefactor,
         },
       });
     } else {
