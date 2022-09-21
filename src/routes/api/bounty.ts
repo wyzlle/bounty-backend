@@ -32,29 +32,42 @@ apiBountyRouter.get("/(.*)", async (ctx) => {
 });
 
 apiBountyRouter.put("/", async (ctx) => {
-  let bounty: Bounty = { id: "", amount: 0, assignee: "" };
+  const req: any = ctx.request.body;
+  let bounty: Bounty = {
+    id: req.id || "",
+    amount: req.amount || 0,
+    assignee: req.assignee || "",
+  };
 
-  if (typeof ctx.request.body!.id === "string") {
-    bounty.id = ctx.request.body!.id;
-  } else {
+  if (bounty.id === "" || bounty.amount <= 0) {
     return (ctx.response.res.statusCode = 400);
   }
-  if (
-    typeof ctx.request.body!.amount === "number" &&
-    ctx.request.body!.amount > 0
-  ) {
-    bounty.amount = ctx.request.body!.amount;
-  } else {
+  try {
+    let bty = await prisma.bounty.findFirst({
+      where: {
+        id: bounty.id,
+      },
+    });
+    if (bty) {
+      await prisma.bounty.update({
+        where: {
+          id: bounty.id,
+        },
+        data: {
+          amount: bounty.amount,
+          assignee: bounty.assignee,
+        },
+      });
+    } else {
+      await prisma.bounty.create({
+        data: bounty,
+      });
+    }
+    ctx.response.res.statusCode = 204;
+  } catch (error) {
+    console.log(error);
     return (ctx.response.res.statusCode = 400);
   }
-  if (typeof ctx.request.body!.assignee === "string") {
-    bounty.assignee = ctx.request.body!.assignee;
-  }
-
-  await prisma.bounty.create({
-    data: bounty,
-  });
-  ctx.response.res.statusCode = 204;
 });
 
 apiBountyRouter.delete("/(.*)", async (ctx) => {
